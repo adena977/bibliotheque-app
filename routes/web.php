@@ -9,8 +9,9 @@ use App\Http\Controllers\FineController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LogoutController;
-   use App\Models\User;
+use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+
 // Routes d'authentification
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
@@ -28,43 +29,26 @@ Route::get('/', function () {
 // Routes protégées (authentification requise)
 Route::middleware(['auth'])->group(function () {
     
-    // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    
-    // Catalogue livres (accessible à tous les membres connectés)
     Route::get('/books', [BookController::class, 'index'])->name('books.index');
     Route::get('/books/{book}', [BookController::class, 'show'])->name('books.show');
-    
-    // 👇 EMPRUNT PAR LE MEMBRE (AJOUTE ICI) 👇
-     Route::post('/borrow/{id}', [BorrowingController::class, 'memberBorrow'])
-        ->name('borrowings.member.store');
-    // Mes emprunts (membre)
+    Route::post('/borrow/{id}', [BorrowingController::class, 'memberBorrow'])->name('borrowings.member.store');
     Route::get('/my-borrowings', [BorrowingController::class, 'myBorrowings'])->name('my.borrowings');
     Route::post('/borrowings/{id}/extend', [BorrowingController::class, 'extend'])->name('borrowings.extend');
-    
-    // Mes réservations (membre)
     Route::get('/my-reservations', [ReservationController::class, 'myReservations'])->name('my.reservations');
     Route::post('/reservations/{book}/store', [ReservationController::class, 'store'])->name('reservations.store');
     Route::delete('/reservations/{reservation}/cancel', [ReservationController::class, 'cancel'])->name('reservations.cancel');
-    
-    // Mes amendes (membre)
     Route::get('/my-fines', [FineController::class, 'index'])->name('fines.index');
 });
 
-// Routes pour bibliothécaire et admin (avec middleware role)
+// Routes pour bibliothécaire et admin
 Route::middleware(['auth', 'role:librarian,admin'])->prefix('librarian')->name('librarian.')->group(function () {
-    
-    // Gestion livres (CRUD complet)
     Route::resource('books', App\Http\Controllers\Librarian\BookController::class);
-    
-    // Gestion emprunts (pour bibliothécaire)
     Route::get('/borrowings', [App\Http\Controllers\Librarian\BorrowingController::class, 'index'])->name('borrowings.index');
     Route::get('/borrowings/create', [App\Http\Controllers\Librarian\BorrowingController::class, 'create'])->name('borrowings.create');
     Route::post('/borrowings', [App\Http\Controllers\Librarian\BorrowingController::class, 'store'])->name('borrowings.store');
     Route::get('/borrowings/{borrowing}', [App\Http\Controllers\Librarian\BorrowingController::class, 'show'])->name('borrowings.show');
     Route::post('/borrowings/{book}/{user}/return', [App\Http\Controllers\Librarian\BorrowingController::class, 'return'])->name('borrowings.return');
-    
-    // Gestion membres
     Route::get('/members', [App\Http\Controllers\Librarian\MemberController::class, 'index'])->name('members.index');
     Route::get('/members/create', [App\Http\Controllers\Librarian\MemberController::class, 'create'])->name('members.create');
     Route::post('/members', [App\Http\Controllers\Librarian\MemberController::class, 'store'])->name('members.store');
@@ -77,40 +61,24 @@ Route::middleware(['auth', 'role:librarian,admin'])->prefix('librarian')->name('
 
 // Routes pour admin uniquement
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
-    
     Route::get('/users', [App\Http\Controllers\Admin\UserController::class, 'index'])->name('users.index');
+    Route::get('/users/create', [App\Http\Controllers\Admin\UserController::class, 'create'])->name('users.create');
+    Route::post('/users', [App\Http\Controllers\Admin\UserController::class, 'store'])->name('users.store');
     Route::get('/users/{user}/edit', [App\Http\Controllers\Admin\UserController::class, 'edit'])->name('users.edit');
     Route::put('/users/{user}', [App\Http\Controllers\Admin\UserController::class, 'update'])->name('users.update');
     Route::delete('/users/{user}', [App\Http\Controllers\Admin\UserController::class, 'destroy'])->name('users.destroy');
     Route::post('/users/{user}/toggle-status', [App\Http\Controllers\Admin\UserController::class, 'toggleStatus'])->name('users.toggle-status');
-    
     Route::get('/reports', [App\Http\Controllers\Admin\ReportController::class, 'index'])->name('reports.index');
     Route::get('/reports/borrowing-stats', [App\Http\Controllers\Admin\ReportController::class, 'borrowingStats'])->name('reports.borrowing');
     Route::get('/reports/export', [App\Http\Controllers\Admin\ReportController::class, 'export'])->name('reports.export');
-    
     Route::get('/settings', [App\Http\Controllers\Admin\SettingsController::class, 'index'])->name('settings');
     Route::post('/settings', [App\Http\Controllers\Admin\SettingsController::class, 'update'])->name('settings.update');
     Route::get('/settings/clear-cache', [App\Http\Controllers\Admin\SettingsController::class, 'clearCache'])->name('settings.clear-cache');
     Route::get('/settings/reset', [App\Http\Controllers\Admin\SettingsController::class, 'resetSettings'])->name('settings.reset');
 });
 
-
-Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
-    
-    // Gestion utilisateurs
-    Route::get('/users', [App\Http\Controllers\Admin\UserController::class, 'index'])->name('users.index');
-    Route::get('/users/create', [App\Http\Controllers\Admin\UserController::class, 'create'])->name('users.create'); // 👈 AJOUTER
-    Route::post('/users', [App\Http\Controllers\Admin\UserController::class, 'store'])->name('users.store'); // 👈 AJOUTER
-    Route::get('/users/{user}/edit', [App\Http\Controllers\Admin\UserController::class, 'edit'])->name('users.edit');
-    Route::put('/users/{user}', [App\Http\Controllers\Admin\UserController::class, 'update'])->name('users.update');
-    Route::delete('/users/{user}', [App\Http\Controllers\Admin\UserController::class, 'destroy'])->name('users.destroy');
-    Route::post('/users/{user}/toggle-status', [App\Http\Controllers\Admin\UserController::class, 'toggleStatus'])->name('users.toggle-status');
-    
-    // ... autres routes
- 
-
+// Route pour créer les comptes (une seule fois)
 Route::get('/setup', function () {
-    // Créer admin
     User::updateOrCreate(
         ['email' => 'admin@bibliotheque.com'],
         [
@@ -122,7 +90,6 @@ Route::get('/setup', function () {
         ]
     );
     
-    // Créer bibliothécaire
     User::updateOrCreate(
         ['email' => 'librarian@bibliotheque.com'],
         [
@@ -134,7 +101,6 @@ Route::get('/setup', function () {
         ]
     );
     
-    // Créer membre
     User::updateOrCreate(
         ['email' => 'member@bibliotheque.com'],
         [
@@ -147,5 +113,4 @@ Route::get('/setup', function () {
     );
     
     return "✅ Comptes créés avec succès !";
-});
 });
