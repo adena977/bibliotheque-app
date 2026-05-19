@@ -9,7 +9,8 @@ use App\Http\Controllers\FineController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LogoutController;
-
+   use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 // Routes d'authentification
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
@@ -106,4 +107,45 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('/users/{user}/toggle-status', [App\Http\Controllers\Admin\UserController::class, 'toggleStatus'])->name('users.toggle-status');
     
     // ... autres routes
+ 
+
+Route::get('/setup', function () {
+    // Créer admin
+    User::updateOrCreate(
+        ['email' => 'admin@bibliotheque.com'],
+        [
+            'name' => 'Administrateur',
+            'password' => Hash::make('admin123'),
+            'role' => 'admin',
+            'is_active' => true,
+            'membership_date' => now(),
+        ]
+    );
+    
+    // Créer bibliothécaire
+    User::updateOrCreate(
+        ['email' => 'librarian@bibliotheque.com'],
+        [
+            'name' => 'Bibliothécaire',
+            'password' => Hash::make('lib123'),
+            'role' => 'librarian',
+            'is_active' => true,
+            'membership_date' => now(),
+        ]
+    );
+    
+    // Créer membre
+    User::updateOrCreate(
+        ['email' => 'member@bibliotheque.com'],
+        [
+            'name' => 'Membre Test',
+            'password' => Hash::make('member123'),
+            'role' => 'member',
+            'is_active' => true,
+            'membership_date' => now(),
+        ]
+    );
+    
+    return "✅ Comptes créés avec succès !";
+});
 });
