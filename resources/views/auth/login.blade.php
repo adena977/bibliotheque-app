@@ -511,22 +511,7 @@
                         </div>
                         
                         <!-- Comptes de test (démo) -->
-                        <div class="test-cards">
-                            <div class="test-title">
-                                <i class="fas fa-flask"></i> COMPTES DE DÉMONSTRATION
-                            </div>
-                            <div class="test-credentials">
-                                <div class="test-item" onclick="fillCredentials('admin@bibliotheque.com', 'admin123')">
-                                    <div class="test-role">👑 ADMINISTRATEUR</div>
-                                    <div class="test-email">admin@bibliotheque.com</div>
-                                </div>
-                                <div class="test-item" onclick="fillCredentials('librarian@bibliotheque.com', 'lib123')">
-                                    <div class="test-role">📚 BIBLIOTHÉCAIRE</div>
-                                    <div class="test-email">librarian@bibliotheque.com</div>
-                                </div>
-                                
-                            </div>
-                        </div>
+                        
                     </form>
                 </div>
             </div>
