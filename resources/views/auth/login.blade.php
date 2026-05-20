@@ -472,25 +472,7 @@
                             <i class="fas fa-arrow-right-to-bracket"></i> Se connecter
                         </button>
                         
-                        <div class="demo-section">
-                            <div class="demo-title">
-                                <i class="fas fa-flask"></i> COMPTES DE DÉMONSTRATION
-                            </div>
-                            <div class="demo-buttons">
-                                <div class="demo-btn" onclick="fillCredentials('admin@bibliotheque.com', 'admin123')">
-                                    <span class="demo-role">👑 ADMINISTRATEUR</span>
-                                    <span class="demo-email">admin@bibliotheque.com</span>
-                                </div>
-                                <div class="demo-btn" onclick="fillCredentials('librarian@bibliotheque.com', 'lib123')">
-                                    <span class="demo-role">📚 BIBLIOTHÉCAIRE</span>
-                                    <span class="demo-email">librarian@bibliotheque.com</span>
-                                </div>
-                                <div class="demo-btn" onclick="fillCredentials('member@bibliotheque.com', 'member123')">
-                                    <span class="demo-role">👤 MEMBRE</span>
-                                    <span class="demo-email">member@bibliotheque.com</span>
-                                </div>
-                            </div>
-                        </div>
+                      
                     </form>
                 </div>
             </div>
