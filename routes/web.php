@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\BookController;
 use App\Http\Controllers\BorrowingController;
@@ -75,6 +76,29 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('/settings', [App\Http\Controllers\Admin\SettingsController::class, 'update'])->name('settings.update');
     Route::get('/settings/clear-cache', [App\Http\Controllers\Admin\SettingsController::class, 'clearCache'])->name('settings.clear-cache');
     Route::get('/settings/reset', [App\Http\Controllers\Admin\SettingsController::class, 'resetSettings'])->name('settings.reset');
+});
+
+// 🚀 ROUTE POUR EXÉCUTER LES MIGRATIONS (À SUPPRIMER APRÈS UTILISATION)
+Route::get('/setup-db', function () {
+    try {
+        Artisan::call('migrate:fresh --force');
+        Artisan::call('db:seed --force');
+        return "<h1 style='color:green; text-align:center; margin-top:50px;'>✅ Base de données initialisée avec succès !</h1>
+                <p style='text-align:center;'>Tables créées et données insérées.</p>
+                <div style='text-align:center; margin-top:20px;'>
+                    <a href='/login' style='background:#4CAF50; color:white; padding:10px 20px; text-decoration:none; border-radius:5px;'>🔐 Se connecter</a>
+                </div>
+                <hr>
+                <div style='text-align:center; margin-top:20px;'>
+                    <p><strong>Comptes de test :</strong></p>
+                    <p>📧 admin@bibliotheque.com / admin123 (Admin)</p>
+                    <p>📧 librarian@bibliotheque.com / lib123 (Bibliothécaire)</p>
+                    <p>📧 member@bibliotheque.com / member123 (Membre)</p>
+                </div>";
+    } catch (\Exception $e) {
+        return "<h1 style='color:red; text-align:center; margin-top:50px;'>❌ Erreur :</h1>
+                <p style='text-align:center;'>" . $e->getMessage() . "</p>";
+    }
 });
 
 // Route pour créer les comptes (une seule fois)
