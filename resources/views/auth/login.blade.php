@@ -524,10 +524,7 @@
                                     <div class="test-role">📚 BIBLIOTHÉCAIRE</div>
                                     <div class="test-email">librarian@bibliotheque.com</div>
                                 </div>
-                                <div class="test-item" onclick="fillCredentials('member@bibliotheque.com', 'member123')">
-                                    <div class="test-role">👤 MEMBRE</div>
-                                    <div class="test-email">member@bibliotheque.com</div>
-                                </div>
+                                
                             </div>
                         </div>
                     </form>
