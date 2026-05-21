@@ -271,7 +271,7 @@
             text-decoration: underline;
         }
 
-        /* Bouton */
+        /* Bouton de connexion */
         .btn-login-modern {
             width: 100%;
             padding: 14px;
@@ -305,6 +305,31 @@
         .btn-login-modern:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 25px -5px rgba(43, 140, 94, 0.4);
+        }
+
+        /* Bouton téléchargement application */
+        .btn-download-app {
+            width: 100%;
+            padding: 12px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #2b8c5e;
+            background: #e8f5e9;
+            border: 1px solid #2b8c5e;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 15px;
+            text-align: center;
+            display: inline-block;
+            text-decoration: none;
+        }
+
+        .btn-download-app:hover {
+            background: #2b8c5e;
+            color: #fff;
+            transform: translateY(-2px);
+            text-decoration: none;
         }
 
         /* Comptes de démonstration */
@@ -369,6 +394,44 @@
             font-size: 0.85rem;
         }
 
+        /* Bannière d'installation */
+        .install-banner {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #1e5799, #2b8c5e);
+            border-radius: 16px;
+            padding: 16px;
+            color: white;
+            display: none;
+            z-index: 1000;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .install-banner button {
+            background: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 30px;
+            margin-top: 10px;
+            font-weight: 600;
+            color: #2b8c5e;
+            cursor: pointer;
+        }
+
+        @media (display-mode: standalone) {
+            .install-banner, .btn-download-app {
+                display: none !important;
+            }
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .illustration-section {
@@ -382,6 +445,11 @@
             }
             .form-title {
                 font-size: 1.5rem;
+            }
+            .install-banner {
+                left: 10px;
+                right: 10px;
+                bottom: 10px;
             }
         }
     </style>
@@ -472,16 +540,34 @@
                             <i class="fas fa-arrow-right-to-bracket"></i> Se connecter
                         </button>
                         
-                      
+                        <!-- Bouton Télécharger l'application -->
+                        <a href="#" class="btn-download-app" id="downloadAppBtn">
+                            <i class="fas fa-download"></i> Télécharger l'application
+                        </a>
+                        
+                        
                     </form>
                 </div>
             </div>
         </div>
     </div>
     
+    <!-- Bannière d'installation PWA -->
+    <div id="installBanner" class="install-banner">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <i class="fas fa-download" style="font-size: 2rem;"></i>
+            <div style="flex: 1;">
+                <strong>Installer l'application</strong><br>
+                <small>Installez Bibliothèque sur votre appareil</small>
+            </div>
+            <button id="installApp">Installer</button>
+        </div>
+    </div>
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
     <script>
+        // Fonction pour remplir automatiquement les identifiants
         function fillCredentials(email, password) {
             document.querySelector('input[name="email"]').value = email;
             document.querySelector('input[name="password"]').value = password;
@@ -492,6 +578,52 @@
             setTimeout(() => {
                 btn.style.transform = '';
             }, 200);
+        }
+        
+        // PWA Installation
+        let deferredPrompt;
+        
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('installBanner').style.display = 'block';
+        });
+        
+        document.getElementById('installApp')?.addEventListener('click', () => {
+            document.getElementById('installBanner').style.display = 'none';
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('Application installée');
+                    }
+                    deferredPrompt = null;
+                });
+            }
+        });
+        
+        // Bouton télécharger (guide d'installation selon l'appareil)
+        document.getElementById('downloadAppBtn')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            
+            const isAndroid = /Android/i.test(navigator.userAgent);
+            const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+            
+            if (isAndroid) {
+                alert('📱 Sur Android :\n\n1. Cliquez sur ⋮ (menu)\n2. Sélectionnez "Installer l\'application"\n3. Confirmez l\'installation');
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                }
+            } else if (isIOS) {
+                alert('📱 Sur iPhone/iPad :\n\n1. Cliquez sur 📤 (partager)\n2. Sélectionnez "Sur l\'écran d\'accueil"\n3. Cliquez sur "Ajouter"');
+            } else {
+                alert('💻 Sur ordinateur :\n\nCette application est optimisée pour mobile.\nVisitez le site sur votre smartphone pour installer l\'application PWA.');
+            }
+        });
+        
+        // Vérifier si l'application est déjà installée
+        if (window.matchMedia('(display-mode: standalone)').matches) {
+            console.log('Application lancée en mode standalone');
         }
     </script>
 </body>
