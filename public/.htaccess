@@ -3,7 +3,7 @@
         Options -MultiViews -Indexes
     </IfModule>
 <IfModule mod_headers.c>
-    Header set Service-Worker-Allowed "/"
+    Header set Content-Security-Policy "script-src 'self' 'unsafe-inline' 'unsafe-eval'; worker-src 'self' blob:;"
 </IfModule>
     RewriteEngine On
 
