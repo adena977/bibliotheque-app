@@ -7,7 +7,100 @@
     <title>@yield('title', 'Bibliothèque')</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
+  <!-- PWA Meta Tags -->
+<link rel="manifest" href="{{ asset('manifest.json') }}">
+<meta name="theme-color" content="#2b8c5e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Bibliothèque">
+<link rel="apple-touch-icon" href="{{ asset('images/icon-192x192.png') }}">
+<link rel="icon" type="image/png" sizes="192x192" href="{{ asset('images/icon-192x192.png') }}">
+<link rel="icon" type="image/png" sizes="512x512" href="{{ asset('images/icon-512x512.png') }}">
+
+<!-- Service Worker -->
+<script>
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+        navigator.serviceWorker.register('/sw.js').then(function(registration) {
+            console.log('Service Worker enregistré avec succès:', registration.scope);
+        }).catch(function(error) {
+            console.log('Erreur d\'enregistrement du Service Worker:', error);
+        });
+    });
+}
+</script>
+
+<!-- Installation de l'application -->
+<style>
+    .install-banner {
+        position: fixed;
+        bottom: 20px;
+        left: 20px;
+        right: 20px;
+        background: linear-gradient(135deg, #1e5799, #2b8c5e);
+        border-radius: 16px;
+        padding: 16px;
+        color: white;
+        display: none;
+        z-index: 1000;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        animation: slideUp 0.5s ease;
+    }
+    
+    @keyframes slideUp {
+        from { transform: translateY(100px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+    
+    .install-banner button {
+        background: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 30px;
+        margin-top: 10px;
+        font-weight: 600;
+        color: #2b8c5e;
+        cursor: pointer;
+    }
+    
+    @media (display-mode: standalone) {
+        .install-banner {
+            display: none !important;
+        }
+    }
+</style>
+
+<div id="installBanner" class="install-banner">
+    <div style="display: flex; align-items: center; gap: 15px;">
+        <i class="fas fa-download" style="font-size: 2rem;"></i>
+        <div style="flex: 1;">
+            <strong>Installer l'application</strong><br>
+            <small>Installez Bibliothèque sur votre appareil</small>
+        </div>
+        <button id="installApp">Installer</button>
+    </div>
+</div>
+
+<script>
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    document.getElementById('installBanner').style.display = 'block';
+    
+    document.getElementById('installApp').addEventListener('click', () => {
+        document.getElementById('installBanner').style.display = 'none';
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then((choiceResult) => {
+            if (choiceResult.outcome === 'accepted') {
+                console.log('Utilisateur a accepté l\'installation');
+            }
+            deferredPrompt = null;
+        });
+    });
+});
+</script>
+  <style>
         body {
             overflow-x: hidden;
         }
